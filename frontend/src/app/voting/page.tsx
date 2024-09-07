@@ -9,13 +9,162 @@ interface VoteProps {
     tokenAmount: number;
 }
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import VoteModal from "@/components/votemodal/page";
 import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Web3 from "web3";
+import { useRouter } from "next/navigation";
 
 export default function Voting({ votes }: VoteProps) {
+    const [account, setAccount] = useState("");
+    const [contract, setContract] = useState<any>(null);
+    const [contractData, setContractData] = useState<any>(null);
+
+    const router = useRouter();
+
+    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const abi = [
+        {
+            inputs: [],
+            stateMutability: "nonpayable",
+            type: "constructor",
+        },
+        {
+            anonymous: false,
+            inputs: [
+                {
+                    indexed: false,
+                    internalType: "address",
+                    name: "sender",
+                    type: "address",
+                },
+                {
+                    indexed: false,
+                    internalType: "uint256",
+                    name: "amount",
+                    type: "uint256",
+                },
+            ],
+            name: "Deposit",
+            type: "event",
+        },
+        {
+            anonymous: false,
+            inputs: [
+                {
+                    indexed: false,
+                    internalType: "address",
+                    name: "sender",
+                    type: "address",
+                },
+                {
+                    indexed: false,
+                    internalType: "uint256",
+                    name: "amount",
+                    type: "uint256",
+                },
+            ],
+            name: "Withdrawal",
+            type: "event",
+        },
+        {
+            inputs: [],
+            name: "getBalance",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "view",
+            type: "function",
+        },
+        {
+            inputs: [],
+            name: "getTotalDeposited",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "view",
+            type: "function",
+        },
+        {
+            inputs: [],
+            name: "totalDeposited",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "view",
+            type: "function",
+        },
+        {
+            inputs: [],
+            name: "totalWithdrawn",
+            outputs: [
+                {
+                    internalType: "uint256",
+                    name: "",
+                    type: "uint256",
+                },
+            ],
+            stateMutability: "view",
+            type: "function",
+        },
+        {
+            inputs: [],
+            name: "withdraw",
+            outputs: [],
+            stateMutability: "nonpayable",
+            type: "function",
+        },
+    ];
+
+    useEffect(() => {
+        if (typeof window.ethereum !== "undefined") {
+            const web3 = new Web3(window.ethereum);
+            const contract = new web3.eth.Contract(abi, contractAddress);
+            setContract(contract);
+        }
+    }, []);
+
+    async function connectWallet() {
+        if (typeof window.ethereum !== "undefined") {
+            const web3 = new Web3(window.ethereum);
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            const accounts = await web3.eth.getAccounts();
+            setAccount(accounts[0]);
+            router.push("/voting");
+            console.log("Connected account:", accounts[0]);
+        } else {
+            console.error("MetaMask is not installed");
+        }
+    }
+
+    async function interactWithContract() {
+        if (contract) {
+            // try {
+            //     // Example: Call a read function from your contract
+            //     const result = await contract.methods.someReadFunction().call();
+            //     setContractData(result);
+            //     // Example: Call a write function from your contract
+            //     // await contract.methods.someWriteFunction(params).send({ from: account });
+            // } catch (error) {
+            //     console.error("Error interacting with contract:", error);
+            // }
+        }
+    }
+
     const [restaurants, setRestaurants] = useState([
         { id: 1, name: "Gourmet Delight", rating: 0, votes: 0 },
         { id: 2, name: "Pasta Paradise", rating: 0, votes: 0 },
