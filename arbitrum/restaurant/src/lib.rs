@@ -16,12 +16,15 @@ use stylus_sdk::{block, console};
 sol_storage! {
     #[entrypoint]
     pub struct RestaurantVoting {
-        mapping(address => uint256) votes; // Votes for each Restaurant (res id -> votes)
-        mapping(address => uint256) token_balances; // Stores token balances (user id -> token);
+        mapping(address => uint256) votes;
+        // Votes for each Restaurant (res id -> votes)
+        mapping(address => uint256) token_balances; 
+        // Stores token balances (user id -> token);
     }
     pub struct TokenSale {
         address token; // Address of the token contract
-        U256 price_per_token;  // Price per token in wei
+        uint256 price_per_token; 
+         // Price per token in wei
     }
 }
 
