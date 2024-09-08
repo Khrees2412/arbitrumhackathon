@@ -1,20 +1,6 @@
-use starknet::prelude::*;
-use restaurant_rating_app::RestaurantRating; // Import your smart contract
+#![cfg_attr(not(feature = "export-abi"), no_main)]
 
+#[cfg(feature = "export-abi")]
 fn main() {
-    // Set up your Starknet environment here
-    let contract = RestaurantRating::new();
-
-    // Example code to interact with the contract
-    let user = 1; // Example user ID
-    let rating = 4; // Example rating
-
-    match contract.rate_restaurant(user, rating) {
-        Ok(()) => println!("Rating submitted successfully!"),
-        Err(e) => println!("Error: {}", e),
-    }
-
-    let average_rating = contract.get_average_rating();
-    println!("Average Rating: {}", average_rating);
+    stylus_counter::print_abi("MIT-OR-APACHE-2.0", "pragma solidity ^0.8.23;");
 }
-
