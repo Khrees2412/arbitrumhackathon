@@ -29,6 +29,7 @@ impl Counter {
     pub fn set_count(&mut self, count: U256) -> Result<(), Vec<u8>> {
         self.count.set(count);
         Ok(())
+
     }
 
     /// Increments count by 1
@@ -36,6 +37,7 @@ impl Counter {
         let count = self.count.get() + U256::from(1);
         self.set_count(count)
     }
+
 
     /// Decrements count by 1
     pub fn dec(&mut self) -> Result<(), Vec<u8>> {

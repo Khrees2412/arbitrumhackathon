@@ -1,5 +1,13 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import VoteModal from "@/components/votemodal/page";
+import { Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Web3 from "web3";
+import { useRouter } from "next/navigation";
+
 interface VoteProps {
     id: number;
     name: string;
@@ -8,14 +16,6 @@ interface VoteProps {
     walletAddress: string;
     tokenAmount: number;
 }
-
-import { useState, useEffect } from "react";
-import VoteModal from "@/components/votemodal/page";
-import { Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Web3 from "web3";
-import { useRouter } from "next/navigation";
 
 export default function Voting({ votes }: VoteProps) {
     const [account, setAccount] = useState("");
