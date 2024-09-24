@@ -26,7 +26,7 @@ export-abi = ["stylus-sdk/export-abi"]
 debug = ["stylus-sdk/debug"]
 
 [[bin]]
-name = "decentralized_blog"
+name = "restaurant_voting"
 path = "src/main.rs"
 
 [lib]
