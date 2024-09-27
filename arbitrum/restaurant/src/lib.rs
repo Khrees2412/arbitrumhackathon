@@ -157,4 +157,9 @@ impl VotingApp {
 
         self.restaurants.push(&new_restaurant);
     }
+
+    #[view]
+    pub fn get_restaurant_votes(&self, restaurant_id: U256) -> U256 {
+        self.restaurant_votes.get(restaurant_id)
+    }
 }
