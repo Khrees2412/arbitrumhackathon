@@ -13,7 +13,6 @@ extern crate alloc;
 // These include U256 for large integers, Address for user addresses, and various
 // storage types for managing data on the blockchain.
 
-use ethers::abi::{AbiType, ParamType};
 use stylus_sdk::msg;
 use stylus_sdk::{alloy_primitives::U256, prelude::*};
 use alloy_primitives::Address;
@@ -28,38 +27,13 @@ use std::pin::Pin;
 pub struct Restaurant {
     pub id: u64,
     pub name: String,
-    pub cuisine: String,
+    pub cuisine: StorageString,
     pub total_votes: U256,
 }
 
 impl Erase for Restaurant {
     fn erase(&mut self) {
         todo!()
-    }
-}
-
-impl AbiType for Restaurant {
-
-    fn param_type() -> ParamType {
-        ParamType::Tuple(vec![
-            ParamType::Uint(64),
-            ParamType::String,
-            ParamType::String,
-            ParamType::Uint(256),
-        ])
-    }
-
-    fn is_dynamic() -> bool {
-        true // Because it contains dynamic-sized Strings
-    }
-
-    fn abi_type_encoding() -> AbiTypeEncoding {
-        AbiTypeEncoding::Tuple(vec![
-            u64::abi_type_encoding(),
-            String::abi_type_encoding(),
-            String::abi_type_encoding(),
-            U256::abi_type_encoding(),
-        ])
     }
 }
 
@@ -81,12 +55,7 @@ impl<'a> SimpleStorageType<'a> for Restaurant {
 impl StorageType for Restaurant {
     fn load<'a>(self) -> Self::Wraps<'a> {
         // Implement the load method
-        Restaurant {
-            id: storage.id,
-            name: storage.name.load.into(),
-            cuisine: storage.cuisine.load.into(),
-            total_votes: storage.total_votes.load.into(),
-        }
+        todo!()
     }
     
     type Wraps<'a> = &'a Restaurant
@@ -98,21 +67,7 @@ impl StorageType for Restaurant {
         Self: 'a;
     
     unsafe fn new(_slot: U256, _offset: u8) -> Self {
-        let id_slot = *slot;
-        *slot += U256::from(1);
-        let name_slot = *slot;
-        *slot += U256::from(1);
-        let cuisine_slot = *slot;
-        *slot += U256::from(1);
-        let total_votes_slot = *slot;
-        *slot += U256::from(1);
-
-        Restaurant {
-            id: 0,
-            name: StorageString::new(name_slot).into(),
-            cuisine: StorageString::new(cuisine_slot).into(),
-            total_votes: StorageU256::new(total_votes_slot),
-        }
+        todo!()
     }
     
     fn load_mut<'s>(self) -> Self::WrapsMut<'s>
@@ -176,14 +131,13 @@ impl VotingApp {
         }
     }
 
-    pub fn add_restaurant(&mut self, name: String, cuisine: String) {
+    pub fn add_restaurant(&mut self, res_id: u64, name: String, cuisine: String) {
         if msg::sender() != self.owner() {
             panic!("Only the owner can add restaurants");
         }
 
-        let id = self.restaurants.len() as u64;
         let mut new_restaurant = Restaurant {
-            id: id,
+            id: res_id.clone(),
             name: name.clone(),
             cuisine: unsafe { StorageString::new(U256::from(0), 0) },
             total_votes: unsafe { *StorageU256::new(U256::from(0), 0) },
@@ -208,19 +162,4 @@ impl VotingApp {
         self.restaurant_votes.get(restaurant_id)
     }
 
-    #[view]
-    pub fn get_all_restaurants(&self) -> Vec<Restaurant> {
-        let mut all_restaurants = Vec::new();
-        for i in 0..self.restaurants.len() {
-            if let Some(restaurant) = self.restaurants.get(i) {
-                all_restaurants.push(Restaurant {
-                    id: restaurant.id,
-                    name: restaurant.name.to_string(),
-                    cuisine: restaurant.cuisine.to_string(),
-                    total_votes: restaurant.total_votes.get(),
-                });
-            }
-        }
-        all_restaurants
-    }
 }

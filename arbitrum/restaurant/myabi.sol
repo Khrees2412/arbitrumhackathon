@@ -15,7 +15,7 @@ interface IVotingApp {
 
     function vote(uint256 restaurant_id, uint256 tokens) external;
 
-    function addRestaurant(string calldata name, string calldata cuisine) external;
+    function addRestaurant(uint64 res_id, string calldata name, string calldata cuisine) external;
 
     function getRestaurantVotes(uint256 restaurant_id) external view returns (uint256);
 }
