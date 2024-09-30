@@ -14,20 +14,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThumbsUp } from "lucide-react";
 
-export default function VoteModal() {
-    const [numberOfTokens, setNumberOfTokens] = useState("");
-
-    const handleNumberOfTokensChange = (e: any) => {
+export default function VoteModal({
+    numberOfTokens,
+    setNumberOfTokens,
+}: {
+    numberOfTokens: string;
+    setNumberOfTokens: (value: string) => void;
+}) {
+    const handleNumberOfTokensChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         setNumberOfTokens(e.target.value);
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (numberOfTokens) {
             console.log("Submitted number of tokens: ", numberOfTokens);
         }
     };
-
     return (
         <Dialog>
             <DialogTrigger asChild>
