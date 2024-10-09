@@ -90,6 +90,7 @@ sol_storage! {
         Restaurant[] restaurants;
         mapping(uint256 => uint256) restaurant_votes;
         uint256 voting_period_end;
+        uint256 token_price;
     }
 }
 
@@ -103,14 +104,38 @@ impl VotingApp {
         self.active.get()
     }
 
+    pub fn constructor(&mut self, token_price: U256) {
+        self.owner.set(msg::sender());
+        self.active.set(true);
+        self.token_price.set(token_price);
+    }
+
     #[view]
-    pub fn get_user_balance(&self, user: Address) -> U256 {
-        self.user_token_balances.get(user)
+    pub fn get_user_balance(&self, user: Address) -> String {
+        self.user_token_balances.get(user).to_string()
+    }
+
+    #[payable]
+    pub fn purchase_tokens(&mut self) {
+        let caller = msg::sender();
+        let payment = msg::value();
+        let token_price = self.token_price.get();
+
+        //Calculates the no. of tokens to purchase
+        let tokens_to_buy = payment / token_price;
+
+        if tokens_to_buy == U256::ZERO {
+            panic!("Insufficient payment to buy tokens");
+        }
+
+        let current_balance = self.user_token_balances.get(caller);
+        let new_balance = current_balance + tokens_to_buy;
+        self.user_token_balances.insert(caller, new_balance);
     }
 
     pub fn vote(&mut self, restaurant_id: U256, tokens: U256) {
         let caller = msg::sender();
-        let mut user_balance = self.get_user_balance(caller);
+        let mut user_balance = self.user_token_balances.get(caller);
         if user_balance < tokens {
             panic!("Insufficient tokens");
         }
@@ -124,11 +149,11 @@ impl VotingApp {
 
         let restaurant_id_u64: u64 = restaurant_id.try_into().unwrap_or_else(|_| panic!("Restaurant ID too large for u64"));
         let restaurant = self.restaurants.get_mut(restaurant_id_u64 as usize).expect("Restaurant not found");
-        let mut total_votes = restaurant.total_votes;
-        total_votes += tokens;
-        unsafe {
-            restaurant.total_votes = *StorageU256::new(total_votes, 0);
-        }
+        let new_total_votes = restaurant.total_votes + tokens;
+        restaurant.total_votes = new_total_votes;
+        // unsafe {
+        //     restaurant.total_votes = *StorageU256::new(total_votes, 0);
+        // }
     }
 
     pub fn add_restaurant(&mut self, res_id: u64, name: String, cuisine: String) {
