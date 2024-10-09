@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import VoteModal from "@/components/votemodal/page";
+import { VoteButton } from "@/components/votemodal/page";
 import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,9 +64,10 @@ export default function Voting() {
         if (contract && account) {
             try {
                 const balanceString = await getBalance(contract, account);
-                setBalance(parseFloat(balanceString)); // Convert the string to a float or leave as string
+                setBalance(Number(balanceString)); // or keep as string if preferred
             } catch (error) {
                 console.error("Error fetching balance:", error);
+                // Handle error in UI if needed
             }
         }
     };
@@ -78,19 +79,18 @@ export default function Voting() {
     }, [contract]);
 
     const handleVoteSubmission = async (restaurantId: string) => {
-        if (contract && numberOfTokens) {
-            try {
-                await handleVote(
-                    restaurantId,
-                    Number(numberOfTokens),
-                    contract
-                );
-                console.log(
-                    `Voted with ${numberOfTokens} tokens for restaurant ${restaurantId}`
-                );
-            } catch (error) {
-                console.error("Error submitting vote:", error);
-            }
+        if (!contract || !numberOfTokens || !account) {
+            console.error("Missing required data for voting");
+            return;
+        }
+
+        try {
+            await handleVote(restaurantId, Number(numberOfTokens), contract);
+            // Refresh balance after successful vote
+            fetchBalance();
+        } catch (error) {
+            console.error("Error submitting vote:", error);
+            // Handle error in UI
         }
     };
 
@@ -149,18 +149,11 @@ export default function Voting() {
                                 "Please connect your wallet to vote"
                             ) : (
                                 <>
-                                    <VoteModal
-                                        numberOfTokens={numberOfTokens}
-                                        setNumberOfTokens={setNumberOfTokens}
+                                    <VoteButton
+                                        restaurantId={restaurant.id}
+                                        onVote={handleVoteSubmission}
+                                        disabled={!account || !numberOfTokens}
                                     />
-                                    <Button
-                                        onClick={() =>
-                                            handleVoteSubmission(restaurant.id)
-                                        }
-                                        className="bg-white text-black hover:bg-gray-200"
-                                    >
-                                        Vote Now
-                                    </Button>
                                 </>
                             )}
                         </div>
