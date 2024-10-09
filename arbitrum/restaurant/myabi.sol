@@ -11,7 +11,11 @@ interface IVotingApp {
 
     function isActive() external view returns (bool);
 
-    function getUserBalance(address user) external view returns (uint256);
+    function constructor(uint256 token_price) external;
+
+    function getUserBalance(address user) external view returns (string memory);
+
+    function purchaseTokens() external payable;
 
     function vote(uint256 restaurant_id, uint256 tokens) external;
 
