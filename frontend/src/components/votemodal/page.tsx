@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ThumbsUp } from "lucide-react";
 
-export default function VoteModal() {
+export default function VoteModal({}) {
     const [numberOfTokens, setNumberOfTokens] = useState("");
 
     const handleNumberOfTokensChange = (e: any) => {

@@ -52,9 +52,9 @@
         "name": "getUserBalance",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "string",
                 "name": "",
-                "type": "uint256"
+                "type": "string"
             }
         ],
         "stateMutability": "view",
@@ -84,6 +84,13 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "purchaseTokens",
+        "outputs": [],
+        "stateMutability": "payable",
         "type": "function"
     },
     {
