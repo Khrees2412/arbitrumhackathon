@@ -24,6 +24,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import Web3 from "web3";
 import Abi from "./abi.json";
+import { get } from "http";
 
 type Restaurant = {
     id: number;
@@ -77,7 +78,7 @@ const restaurants: Restaurant[] = [
 export default function Voting() {
     const [account, setAccount] = useState("");
     const [contract, setContract] = useState<any>(null);
-    const [userBalance, setUserBalance] = useState("");
+    const [walletBalance, setWalletBalance] = useState("");
     const [numberOfTokens, setNumberOfTokens] = useState("");
 
     useEffect(() => {
@@ -93,7 +94,7 @@ export default function Voting() {
 
     useEffect(() => {
         if (account) {
-            getUserBalance();
+            getWalletBalance();
         }
     }, [account]);
 
@@ -140,7 +141,6 @@ export default function Voting() {
                         item.name,
                         item.cuisine
                     );
-                    // .send({ from: account });
                 }
                 toast({
                     title: "Restaurants Created",
@@ -162,12 +162,12 @@ export default function Voting() {
     const voteForRestaurant = async (id: number, votes: number) => {
         if (contract && account) {
             try {
-                await contract.methods.vote(id, votes).send({ from: account });
+                await contract.methods.vote(id, votes);
                 toast({
                     title: "Vote Successful",
                     description: `You've cast ${votes} vote(s) for restaurant #${id}`,
                 });
-                getUserBalance();
+                getWalletBalance();
             } catch (error) {
                 console.error("Error voting for restaurant:", error);
                 toast({
@@ -179,15 +179,20 @@ export default function Voting() {
         }
     };
 
-    const getUserBalance = async () => {
+    const getWalletBalance = async () => {
         if (contract && account) {
             try {
-                const balance = await contract.methods
-                    .getUserBalance(account)
-                    .call();
-                setUserBalance(balance);
+                if (typeof window.ethereum !== "undefined") {
+                    const web3 = new Web3(window.ethereum);
+                    // Fetch the balance
+                    const balance = await web3.eth.getBalance(account);
+
+                    // Convert the balance from Wei to Ether
+                    const balanceInEth = web3.utils.fromWei(balance, "ether");
+                    setWalletBalance(parseFloat(balanceInEth).toFixed(2));
+                }
             } catch (error) {
-                console.error("Error getting user balance:", error);
+                console.error("Error getting wallet balance:", error);
             }
         }
     };
@@ -205,7 +210,7 @@ export default function Voting() {
                                 variant="secondary"
                                 className="text-sm px-3 py-1"
                             >
-                                Balance: {userBalance} tokens
+                                Balance: {walletBalance} tokens
                             </Badge>
                         )}
                         <Button
